@@ -1,7 +1,7 @@
 import pyopencl as cl
 import numpy as np
 
-class MPI: 
+class xeMPI: 
     def __init__(self): 
         platforms = cl.get_platforms()
         platform = next(p for p in platforms if "Intel" in p.name)

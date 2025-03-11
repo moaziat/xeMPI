@@ -1,8 +1,8 @@
-from mpi import MPI
+from mpi import xeMPI
 import numpy as np
 
 
-mpi = MPI()
+mpi = xeMPI()
 
 print("Using GPU:", mpi.gpu.name)
 
