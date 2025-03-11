@@ -2,6 +2,19 @@ import pyopencl as cl
 import numpy as np
 
 class xeMPI: 
+    """
+    
+    matve_mul kernel: 
+        get_global_id(0): gives each thread a unique ID 
+    send_to_gpu:
+        transfers data from CPU memory to GPU memory
+        allocates a GPU memory buffer of size data.nbytes (total bytes of the array)  
+    receive_from_gpu: 
+        creates empty numpy array on the CPU with shape that matches the kernel output
+    gpu_execute_matvec: 
+        runs matvec_mul on the GPU to compute the matrix-vector product
+        global_size = the total number the GPU will launch to compute the matrix-vector multiplication. How many threads the GPU to handle all rows of the matrix
+    """
     def __init__(self): 
         platforms = cl.get_platforms()
         platform = next(p for p in platforms if "Intel" in p.name)
