@@ -1,0 +1,32 @@
+name: xeMPI CI
+
+on: 
+  push: 
+    branches: [ main ]
+  
+jobs: 
+  test: 
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name : Checkout code
+        uses : actions/setup-python@4
+      
+      - name : Set up python
+        uses : actions/setup-python@v4
+        with : 
+          python-version: '3.12.2'
+
+      - name : Install requirements
+        run : |
+          sudo apt-get update
+          sudo apt-get install -y ocl-icd-opencl-dev 
+          sudo apt-get install -y clinfo
+          python -m pip install --upgrade pip
+          pip install numpy pytest pyopencl
+
+      - name: verify gpu setup
+        run: python setup_test.py
+
+      - name: run tests
+        run : pytest tests.py -v
