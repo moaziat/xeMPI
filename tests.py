@@ -21,6 +21,8 @@ def test_matvec(xempi_instance):
     v_gpu = xempi_instance.send_to_gpu(v)
     result_buf = xempi_instance.execute_matvec(A_gpu, v_gpu, 3, 4)
     result = xempi_instance.receive_from_gpu(result_buf, (3,))
+    print(f'xeMPI result: {result}')
+    print(f'Expected result: {expected}')
 
     assert np.allclose(result, expected, rtol=1e-5), "Matvec test failed"
 
@@ -34,5 +36,7 @@ def test_dot(xempi_instance):
     v1_gpu = xempi_instance.send_to_gpu(v1)
     v2_gpu = xempi_instance.send_to_gpu(v2)
     result = xempi_instance.execute_dot_product(v1_gpu, v2_gpu, size)
-    
+    print(f'xeMPI result: {result}')
+    print(f'Expected result: {expected}')
+
     assert np.allclose(result, expected, rtol=1e-5), "Dot product test failed"
