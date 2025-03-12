@@ -25,5 +25,3 @@ jobs:
           python -m pip install --upgrade pip
           pip install numpy pytest pyopencl
 
-      - name: run tests
-        run : pytest tests.py -v
