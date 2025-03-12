@@ -53,9 +53,9 @@ if __name__ == "__main__":
     run_matvec_test(mpi, matrix_med, vector_med, 100, 100, "Medium Matrix Test")
 
     # Test 3: Large matrix (1000x1000)
-    matrix_large = np.random.rand(100000, 100000).astype(np.float32)
-    vector_large = np.random.rand(10000).astype(np.float32)
-    run_matvec_test(mpi, matrix_large, vector_large, 100000, 100000, "Large Matrix Test")
+    matrix_large = np.random.rand(20000, 20000).astype(np.float32)
+    vector_large = np.random.rand(20000).astype(np.float32)
+    run_matvec_test(mpi, matrix_large, vector_large, 20000, 20000, "Large Matrix Test")
 
     # Test 4: Edge case - Single element (1x1)
     matrix_single = np.array([[2.0]], dtype=np.float32)
