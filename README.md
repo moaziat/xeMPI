@@ -1,3 +1,6 @@
+[![ci](https://github.com/moaziat/jaxGPT/actions/workflows/ci.yml/badge.svg)](https://github.com/moaziat/jaxGPT/actions/workflows/ci.yml)
+
+
 ## Overview
 
 Hands on GPU programming with PyOpenCL 
