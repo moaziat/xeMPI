@@ -2,8 +2,8 @@ import pyopencl as cl
 import numpy as np
 
 class xeMPI: 
+
     """
-    
     matve_mul kernel: 
         get_global_id(0): gives each thread a unique ID 
     send_to_gpu:
@@ -11,18 +11,28 @@ class xeMPI:
         allocates a GPU memory buffer of size data.nbytes (total bytes of the array)  
     receive_from_gpu: 
         creates empty numpy array on the CPU with shape that matches the kernel output
-    gpu_execute_matvec: 
+    execute_matvec: 
         runs matvec_mul on the GPU to compute the matrix-vector product
-        global_size = the total number the GPU will launch to compute the matrix-vector multiplication. How many threads the GPU to handle all rows of the matrix
+    global_size: the total number the GPU will launch to compute the matrix-vector multiplication. How many threads the GPU to handle all rows of the matrix
+    execute_dot_product:
+        runs dot_product kernel on the GPU to compute the dot product between two vectors v1 & v2
     """
 
-    def __init__(self): 
+
+    def __init__(self, max_size=10000, local_size=None):
         platforms = cl.get_platforms()
         platform = next(p for p in platforms if "Intel" in p.name)
         devices = platform.get_devices()
         self.gpu = next(d for d in devices if cl.device_type.GPU & d.type)
         self.ctx = cl.Context([self.gpu])
         self.queue = cl.CommandQueue(self.ctx)
+        
+        self.max_size = max_size
+        self.local_size = local_size or min(64, self.gpu.max_work_group_size)
+
+        #pre-allocated buffers
+        self.vector_buf = cl.Buffer(self.ctx, cl.mem_flags.READ_WRITE, size=max_size * 4)
+        self.result_buf = cl.Buffer(self.ctx, cl.mem_flags.READ_WRITE, size=max_size * 4)
 
 
         self.kernel_code = """
@@ -73,23 +83,17 @@ class xeMPI:
     
     def execute_matvec(self, matrix_data, vector_data, rows, cols): 
 
-        matvec_buf = cl.Buffer(self.ctx, cl.mem_flags.READ_WRITE, size=rows*4)
-
-        local_size = 64 
-        global_size = ((rows + local_size - 1) // local_size) * local_size
-        self.program.matvec_mul(self.queue, (global_size,), (local_size,), matrix_data, vector_data, matvec_buf, np.int32(rows), np.int32(cols))
+        global_size = ((rows + self.local_size - 1) // self.local_size) * self.local_size
+        self.program.matvec_mul(self.queue, (global_size,), (self.local_size,), matrix_data, vector_data, self.result_buf, np.int32(rows), np.int32(cols))
         self.queue.finish()
 
-        return matvec_buf
+        return self.result_buf
     
     def execute_dot_product(self, v1, v2, size):
 
-        dot_buf = cl.Buffer(self.ctx, cl.mem_flags.READ_WRITE, size=size*4)
-        
-        local_size = 64
-        global_size = ((size + local_size - 1) // local_size) * local_size
-        self.program.dot_product(self.queue, (global_size,), (local_size,), v1, v2, dot_buf, np.int32(size))
+        global_size = ((size + self.local_size - 1) // self.local_size) * self.local_size
+        self.program.dot_product(self.queue, (global_size,), (self.local_size,), v1, v2, self.result_buf, np.int32(size))
         self.queue.finish()
-        dot_res = self.receive_from_gpu(dot_buf, (size,))
+        dot_res = self.receive_from_gpu(self.result_buf, (size,))
 
         return np.sum(dot_res)
