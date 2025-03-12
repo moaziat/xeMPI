@@ -1,5 +1,4 @@
-[![ci](https://github.com/moaziat/jaxGPT/actions/workflows/ci.yml/badge.svg)](https://github.com/moaziat/jaxGPT/actions/workflows/ci.yml)
-
+[![xeMPI CI](https://github.com/moaziat/xeMPI/actions/workflows/ci.yml/badge.svg)](https://github.com/moaziat/xeMPI/actions/workflows/ci.yml)
 
 ## Overview
 
